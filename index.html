@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神秘塔罗占卜</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a12;
+            --primary-gold: #c9a227;
+            --secondary-blue: #1a1a2e;
+            --accent-purple: #7b2d8e;
+            --text-ivory: #e8e6e3;
+            --card-bg: #12121c;
+            --card-border: #c9a227;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: var(--bg-dark);
+            color: var(--text-ivory);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 32px 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 64px;
+            padding: 48px 0;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            color: var(--primary-gold);
+            text-shadow: 0 0 30px rgba(201, 162, 39, 0.5);
+            letter-spacing: 0.3em;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: var(--text-ivory);
+            opacity: 0.7;
+            font-style: italic;
+            letter-spacing: 0.2em;
+        }
+
+        .divider {
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-gold), transparent);
+            margin: 24px auto;
+        }
+
+        .input-section {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--card-bg));
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 48px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--primary-gold);
+            margin-bottom: 8px;
+            letter-spacing: 0.1em;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            border-radius: 8px;
+            color: var(--text-ivory);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 20px rgba(201, 162, 39, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 18px 32px;
+            background: linear-gradient(135deg, var(--primary-gold), #a88420);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-dark);
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(201, 162, 39, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        .divination-section {
+            display: none;
+            margin-bottom: 48px;
+        }
+
+        .divination-section.active {
+            display: block;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 32px;
+            letter-spacing: 0.15em;
+        }
+
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+            perspective: 1000px;
+        }
+
+        .tarot-card {
+            width: 180px;
+            height: 280px;
+            position: relative;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+        }
+
+        .tarot-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--card-bg));
+            border: 2px solid var(--primary-gold);
+            box-shadow: 0 0 20px rgba(201, 162, 39, 0.3);
+        }
+
+        .card-back-symbol {
+            font-size: 3rem;
+            color: var(--primary-gold);
+            opacity: 0.8;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, var(--card-bg), var(--secondary-blue));
+            border: 2px solid var(--primary-gold);
+            transform: rotateY(180deg);
+            text-align: center;
+            box-shadow: 0 0 30px rgba(201, 162, 39, 0.4);
+        }
+
+        .card-number {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: var(--primary-gold);
+            position: absolute;
+            top: 12px;
+            left: 12px;
+        }
+
+        .card-symbol-main {
+            font-size: 3.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 12px;
+        }
+
+        .card-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            color: var(--primary-gold);
+            margin-bottom: 8px;
+            letter-spacing: 0.1em;
+        }
+
+        .card-name-en {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.85rem;
+            color: var(--text-ivory);
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+
+        .card-keywords {
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            line-height: 1.6;
+        }
+
+        .card-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .slot-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            color: var(--primary-gold);
+            margin-bottom: 12px;
+            letter-spacing: 0.1em;
+        }
+
+        .draw-btn-container {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .draw-btn {
+            padding: 16px 48px;
+            background: linear-gradient(135deg, var(--accent-purple), #5a2068);
+            border: 2px solid var(--primary-gold);
+            border-radius: 50px;
+            color: var(--text-ivory);
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .draw-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(123, 45, 142, 0.5);
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--card-bg));
+            border: 1px solid rgba(201, 162, 39, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+        }
+
+        .result-card-icon {
+            width: 60px;
+            height: 80px;
+            background: var(--card-bg);
+            border: 1px solid var(--primary-gold);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .result-card-symbol {
+            font-size: 1.8rem;
+            color: var(--primary-gold);
+        }
+
+        .result-title {
+            flex: 1;
+        }
+
+        .result-card-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            color: var(--primary-gold);
+            margin-bottom: 4px;
+        }
+
+        .result-position {
+            font-size: 0.85rem;
+            color: var(--accent-purple);
+            letter-spacing: 0.1em;
+        }
+
+        .result-keywords {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(201, 162, 39, 0.1);
+            border-radius: 8px;
+        }
+
+        .result-keywords span {
+            display: inline-block;
+            padding: 4px 12px;
+            margin: 4px;
+            background: rgba(123, 45, 142, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .result-meaning {
+            line-height: 1.8;
+            color: var(--text-ivory);
+        }
+
+        .result-meaning strong {
+            color: var(--primary-gold);
+        }
+
+        .reset-btn {
+            display: inline-block;
+            padding: 14px 36px;
+            background: transparent;
+            border: 1px solid var(--primary-gold);
+            border-radius: 8px;
+            color: var(--primary-gold);
+            font-family: 'Cinzel', serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 32px;
+        }
+
+        .reset-btn:hover {
+            background: var(--primary-gold);
+            color: var(--bg-dark);
+        }
+
+        footer {
+            text-align: center;
+            padding: 48px 0;
+            border-top: 1px solid rgba(201, 162, 39, 0.2);
+            margin-top: 64px;
+        }
+
+        .footer-quote {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1rem;
+            color: var(--text-ivory);
+            opacity: 0.6;
+            margin-bottom: 16px;
+        }
+
+        .footer-symbol {
+            font-size: 2rem;
+            color: var(--primary-gold);
+            opacity: 0.4;
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                gap: 16px;
+            }
+
+            .tarot-card {
+                width: 140px;
+                height: 220px;
+            }
+
+            .card-symbol-main {
+                font-size: 2.5rem;
+            }
+
+            .card-name {
+                font-size: 0.95rem;
+            }
+
+            .input-section {
+                padding: 24px 16px;
+            }
+        }
+
+        .glowing {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(201, 162, 39, 0.3); }
+            to { box-shadow: 0 0 40px rgba(201, 162, 39, 0.6); }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+
+    <div class="container">
+        <header>
+            <h1>神秘塔罗</h1>
+            <div class="divider"></div>
+            <p class="subtitle">开启你的命运之门</p>
+        </header>
+
+        <section class="input-section" id="inputSection">
+            <div class="form-group">
+                <label for="name">占卜对象</label>
+                <input type="text" id="name" placeholder="请输入你的名字" maxlength="20">
+                <p class="error-msg" id="nameError">请输入你的名字</p>
+            </div>
+            <div class="form-group">
+                <label for="question">询问问题</label>
+                <textarea id="question" placeholder="你想询问什么？例如：我的事业发展如何？" maxlength="100"></textarea>
+                <p class="error-msg" id="questionError">请输入你想询问的问题</p>
+            </div>
+            <button class="btn" id="startBtn">开始占卜</button>
+        </section>
+
+        <section class="divination-section" id="divinationSection">
+            <h2 class="section-title">抽取你的命运之牌</h2>
+            <p style="text-align: center; margin-bottom: 24px; opacity: 0.7;">
+                静心冥想，点击下方按钮抽取三张牌
+            </p>
+            <div class="draw-btn-container">
+                <button class="draw-btn" id="drawBtn">✦ 抽取三张牌 ✦</button>
+            </div>
+            <div class="cards-container" id="cardsContainer">
+                <div class="card-slot" id="slot0">
+                    <span class="slot-label">过去</span>
+                    <div class="tarot-card" id="card0">
+                        <div class="card-face card-back">
+                            <span class="card-back-symbol">✦</span>
+                        </div>
+                        <div class="card-face card-front">
+                            <span class="card-number"></span>
+                            <span class="card-symbol-main"></span>
+                            <span class="card-name"></span>
+                            <span class="card-name-en"></span>
+                            <span class="card-keywords"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-slot" id="slot1">
+                    <span class="slot-label">现在</span>
+                    <div class="tarot-card" id="card1">
+                        <div class="card-face card-back">
+                            <span class="card-back-symbol">✦</span>
+                        </div>
+                        <div class="card-face card-front">
+                            <span class="card-number"></span>
+                            <span class="card-symbol-main"></span>
+                            <span class="card-name"></span>
+                            <span class="card-name-en"></span>
+                            <span class="card-keywords"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-slot" id="slot2">
+                    <span class="slot-label">未来</span>
+                    <div class="tarot-card" id="card2">
+                        <div class="card-face card-back">
+                            <span class="card-back-symbol">✦</span>
+                        </div>
+                        <div class="card-face card-front">
+                            <span class="card-number"></span>
+                            <span class="card-symbol-main"></span>
+                            <span class="card-name"></span>
+                            <span class="card-name-en"></span>
+                            <span class="card-keywords"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="result-section" id="resultSection">
+            <h2 class="section-title">塔罗解读</h2>
+            <div id="resultContainer"></div>
+            <div style="text-align: center;">
+                <button class="reset-btn" id="resetBtn">重新占卜</button>
+            </div>
+        </section>
+
+        <footer>
+            <p class="footer-quote">"星辰不会欺骗真诚的心"</p>
+            <div class="footer-symbol">☽ ☾</div>
+        </footer>
+    </div>
+
+    <script>
+        const tarotCards = [
+            { num: 0, name: "愚者", nameEn: "The Fool", keywords: "新开始、自由、冒险", symbol: "👤", meaning: "愚者代表着新的旅程即将开始。它暗示你需要勇敢地踏出第一步，接受未知的挑战。这是一个充满可能性的时刻，保持开放的心态和冒险的精神，你会发现意想不到的惊喜。" },
+            { num: 1, name: "魔术师", nameEn: "The Magician", keywords: "创造、意志、技能", symbol: "🪄", meaning: "魔术师象征着你拥有实现目标所需的所有能力和资源。现在是时候将你的想法转化为行动了。你的意志力和创造力正在巅峰状态，善用这些力量来创造你想要的未来。" },
+            { num: 2, name: "女祭司", nameEn: "The High Priestess", keywords: "智慧、直觉、神秘", symbol: "🌙", meaning: "女祭司提醒你要倾听内心的声音，你的直觉正在给你重要的指引。在面对选择时，不要只看表面的情况，要深入内在去感受真相。宁静和沉默中藏着你要的答案。" },
+            { num: 3, name: "皇后", nameEn: "The Empress", keywords: "丰盛、母性、创造力", symbol: "👑", meaning: "皇后象征着丰盛与成长的能量。如果你正在等待某件事情的发生，保持耐心，美好即将到来。这是创造力蓬勃的时期，无论是艺术创作还是孕育新生命，都是好时机。" },
+            { num: 4, name: "皇帝", nameEn: "The Emperor", keywords: "权威、稳定、领导", symbol: "🏛️", meaning: "皇帝代表着秩序和结构。你现在需要建立明确的规则和框架来管理你的生活或事业。这是一个需要成熟和稳重的时期，展现你的领导能力，但也要学会灵活变通。" },
+            { num: 5, name: "教皇", nameEn: "The Hierophant", keywords: "传统、教导、信仰", symbol: "📜", meaning: "教皇暗示你现在需要寻求专家或长辈的指导。不要独自摸索，谦虚地请教有经验的人会让你少走弯路。传统的智慧和方法在这个时期会给你带来帮助。" },
+            { num: 6, name: "恋人", nameEn: "The Lovers", keywords: "爱情、选择、和谐", symbol: "💕", meaning: "恋人牌代表着你面临重要的选择。这个选择涉及到你内心的价值观和优先级。跟随你的心，听从内心的声音，你会找到正确的方向。和谐的关系对现在的你很重要。" },
+            { num: 7, name: "战车", nameEn: "The Chariot", keywords: "胜利、意志、决心", symbol: "⚔️", meaning: "战车象征着胜利和克服障碍。你正在面对的挑战需要坚定的意志和决心去克服。保持前进的动力，不要放弃，你已经走在正确的道路上，胜利就在前方。" },
+            { num: 8, name: "力量", nameEn: "Strength", keywords: "勇气、耐心、内在力量", symbol: "🦁", meaning: "力量代表着内在的强大力量。它不是关于压制或控制，而是关于用温柔的方式展现你的勇气。现在需要的是耐心和内心的平静相信自己的力量，用智慧而非蛮力解决问题。" },
+            { num: 9, name: "隐士", nameEn: "The Hermit", keywords: "反思、内在探索、智慧", symbol: "🕯️", meaning: "隐士提醒你需要独处的时间来进行内在的探索和反思。这是一个自我发现的时期，通过静心思考你会获得新的洞察。暂时远离喧嚣，向内寻找答案。" },
+            { num: 10, name: "命运之轮", nameEn: "Wheel of Fortune", keywords: "转变、运气、时机", symbol: "🎡", meaning: "命运之轮象征着人生的转变和机遇。好运正在向你走来，这是把握时机的关键时刻。无论之前经历了什么，现在是一个新的循环开始，准备好迎接新的机遇。" },
+            { num: 11, name: "正义", nameEn: "Justice", keywords: "平衡、因果、真理", symbol: "⚖️", meaning: "正义提醒你因果法则始终在运作。你的行动会带来相应的结果，现在是时候承担起责任了。保持公平公正的态度，追求truth理，你会得到你想要的结果。" },
+            { num: 12, name: "倒吊人", nameEn: "The Hanged Man", keywords: "牺牲、等待、新视角", symbol: "⏸️", meaning: "倒吊人代表着需要换个角度看问题的时刻。有时候停止前进，转变思维模式，反而能带来突破。这可能是需要耐心等待的时期，换个角度你会发现新的可能性。" },
+            { num: 13, name: "死亡", nameEn: "Death", keywords: "结束、转变、蜕变", symbol: "💀", meaning: "死亡牌虽然看起来可怕，但实际上代表着结束和新的开始。旧的不去，新的不来。放下过去的包袱，拥抱改变，这是蜕变的时刻，准备好迎接新的人生阶段。" },
+            { num: 14, name: "节制", nameEn: "Temperance", keywords: "平衡、耐心、Moderation", symbol: "🏺", meaning: "节制代表着平衡和适度。现在你需要找到生活中的平衡点，不要过度也不要不足。保持耐心，控制好自己的情绪和欲望，中庸之道会让你走得更远。" },
+            { num: 15, name: "恶魔", nameEn: "The Devil", keywords: "束缚、欲望、物质", symbol: "😈", meaning: "恶魔牌提醒你注意那些不必要的束缚和依赖。可能是时候摆脱一些不良习惯或有毒的关系了。物质的追求不应该成为你的全部，重视精神的自由。" },
+            { num: 16, name: "塔", nameEn: "The Tower", keywords: "剧变、觉醒、解放", symbol: "🗼", meaning: "塔牌代表着突如其来的剧变和觉醒。虽然可能让你感到不安，但这是一个必要的转折点。旧的观念和结构需要崩塌，这样才能为新的东西腾出空间。" },
+            { num: 17, name: "星星", nameEn: "The Star", keywords: "希望、灵感、疗愈", symbol: "⭐", meaning: "星星代表着希望和灵感。经过一段艰难的时期，美好的时光即将到来。保持希望，相信明天会更美好。这是疗愈和恢复活力的时期，让你的创造力自由流淌。" },
+            { num: 18, name: "月亮", nameEn: "The Moon", keywords: "幻觉、直觉、恐惧", symbol: "🌕", meaning: "月亮提醒你要小心那些隐藏在表面下的东西。你的直觉正在给你重要的信号，但也要学会区分真实的洞察和恐惧造成的幻觉。相信你的直觉，但也要保持理性思考。" },
+            { num: 19, name: "太阳", nameEn: "The Sun", keywords: "成功、活力、快乐", symbol: "☀️", meaning: "太阳象征着成功、活力和纯粹的快乐。这是一个充满正能量的时期，你将感受到前所未有的活力和热情。享受这个美好的时光，让你的创造力和社会关系蓬勃发展。" },
+            { num: 20, name: "审判", nameEn: "Judgement", keywords: "重生、觉醒、救赎", symbol: "🔔", meaning: "审判代表着重要的决定时刻和内在的觉醒。这是一个重新评估自己生活的时期，你之前的努力即将得到认可。这是一个机会，让你自己做出选择，迎接新的开始。" },
+            { num: 21, name: "世界", nameEn: "The World", keywords: "完成、成就、圆满", symbol: "🌍", meaning: "世界牌象征着旅程的圆满完成。你已经完成了一个重要的阶段，现在是时候庆祝你的成就了。这是一个成功的时刻，所有的努力都得到了回报，新的旅程即将展开。" }
+        ];
+
+        const positions = [
+            { label: "过去", desc: "过去的经历与影响" },
+            { label: "现在", desc: "当前的状态与挑战" },
+            { label: "未来", desc: "未来可能的发展" }
+        ];
+
+        let userName = "";
+        let userQuestion = "";
+        let selectedCards = [];
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.opacity = Math.random() * 0.5 + 0.3;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function validateInput() {
+            let valid = true;
+            const name = document.getElementById('name').value.trim();
+            const question = document.getElementById('question').value.trim();
+
+            document.getElementById('nameError').classList.remove('show');
+            document.getElementById('questionError').classList.remove('show');
+
+            if (!name) {
+                document.getElementById('nameError').classList.add('show');
+                valid = false;
+            }
+            if (!question) {
+                document.getElementById('questionError').classList.add('show');
+                valid = false;
+            }
+
+            if (valid) {
+                userName = name;
+                userQuestion = question;
+            }
+
+            return valid;
+        }
+
+        function startDivination() {
+            if (!validateInput()) return;
+
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('divinationSection').classList.add('active');
+        }
+
+        function drawCards() {
+            const shuffled = shuffle(tarotCards);
+            selectedCards = [shuffled[0], shuffled[1], shuffled[2]];
+
+            const drawBtn = document.getElementById('drawBtn');
+            drawBtn.disabled = true;
+
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const card = document.getElementById('card' + i);
+                    const cardData = selectedCards[i];
+
+                    card.querySelector('.card-number').textContent = cardData.num;
+                    card.querySelector('.card-symbol-main').textContent = cardData.symbol;
+                    card.querySelector('.card-name').textContent = cardData.name;
+                    card.querySelector('.card-name-en').textContent = cardData.nameEn;
+                    card.querySelector('.card-keywords').textContent = cardData.keywords;
+
+                    card.classList.add('glowing');
+
+                    setTimeout(() => {
+                        card.classList.remove('glowing');
+                        card.classList.add('flipped');
+                    }, 300);
+                }, i * 800);
+            }
+
+            setTimeout(() => {
+                showResults();
+            }, 3000);
+        }
+
+        function showResults() {
+            document.getElementById('divinationSection').classList.remove('active');
+            document.getElementById('resultSection').classList.add('active');
+
+            const container = document.getElementById('resultContainer');
+            container.innerHTML = '';
+
+            selectedCards.forEach((card, index) => {
+                const position = positions[index];
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+                resultCard.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-card-icon">
+                            <span class="result-card-symbol">${card.symbol}</span>
+                        </div>
+                        <div class="result-title">
+                            <div class="result-card-name">${card.name} · ${card.nameEn}</div>
+                            <div class="result-position">${position.label} · ${position.desc}</div>
+                        </div>
+                    </div>
+                    <div class="result-keywords">
+                        ${card.keywords.split('、').map(k => `<span>${k}</span>`).join('')}
+                    </div>
+                    <p class="result-meaning">
+                        <strong>解读：</strong>${card.meaning}
+                    </p>
+                `;
+                container.appendChild(resultCard);
+            });
+
+            document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function reset() {
+            selectedCards = [];
+            userName = "";
+            userQuestion = "";
+
+            document.getElementById('name').value = '';
+            document.getElementById('question').value = '';
+            document.getElementById('drawBtn').disabled = false;
+
+            for (let i = 0; i < 3; i++) {
+                const card = document.getElementById('card' + i);
+                card.classList.remove('flipped');
+            }
+
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('divinationSection').classList.remove('active');
+            document.getElementById('inputSection').style.display = 'block';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('startBtn').addEventListener('click', startDivination);
+        document.getElementById('drawBtn').addEventListener('click', drawCards);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+
+        createStars();
+    </script>
+</body>
+</html>
